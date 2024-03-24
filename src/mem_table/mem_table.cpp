@@ -1,5 +1,6 @@
 #include "include/mem_table.h"
 #include <iostream>
+#include <mutex>
 
 MemTable::MemTable(size_t id) : id(id) {
   map = std::make_shared<goodliffe::skip_list<std::pair<std::string, std::string>, KeyCompare>>();
@@ -7,6 +8,7 @@ MemTable::MemTable(size_t id) : id(id) {
 }
 
 std::optional<std::string> MemTable::Get(const std::string& key) {
+  std::shared_lock lock(mutex);
   auto result = map->find(std::make_pair(key, std::string()));
   if (result != map->end()) {
     return (*result).second;
@@ -16,12 +18,14 @@ std::optional<std::string> MemTable::Get(const std::string& key) {
 
 
 void MemTable::Put(const std::string& key, const std::string& value) {
+  std::unique_lock lock(mutex);
   size_t estimated_size = key.size() + value.size();
   map->insert(std::make_pair(key, value));
   approximate_size->fetch_add(estimated_size, std::memory_order_relaxed);
 }
 
 void MemTable::Delete(const std::string& key) {
+  std::unique_lock lock(mutex);
   auto result = map->find(std::make_pair(key, std::string()));
   if (result == map->end()){
   }

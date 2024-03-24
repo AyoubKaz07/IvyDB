@@ -6,6 +6,7 @@
 #include <string>
 #include <optional>
 #include <memory>
+#include <shared_mutex>
 #include "include/skip_list.h"
 
 
@@ -24,6 +25,7 @@ private:
   std::shared_ptr<goodliffe::skip_list<std::pair<std::string, std::string>, KeyCompare>> map;
   size_t id;
   std::shared_ptr<std::atomic<size_t>> approximate_size;
+  std::shared_mutex mutex;
 
 public:
   MemTable(size_t id);

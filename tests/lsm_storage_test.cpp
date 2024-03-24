@@ -100,12 +100,12 @@ TEST(LsmStorageTest, TestPutGetDeleteMultithreaded) {
   LsmStorageOptions options = {1, 20};
   LsmStorageInner storage("test", options);
   std::vector<std::thread> threads;
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 10000; i++) {
     threads.push_back(std::thread([&storage, i](){
       storage.Put(std::to_string(i), std::to_string(i));
     }));
   }
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 10000; i++) {
     threads.push_back(std::thread([&storage, i](){
       auto result = storage.Get(std::to_string(i));
       std::cout << "Get " << i << std::endl;
@@ -113,7 +113,7 @@ TEST(LsmStorageTest, TestPutGetDeleteMultithreaded) {
       ASSERT_EQ(result.value(), std::to_string(i));
     }));
   }
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 10000; i++) {
     threads.push_back(std::thread([&storage, i](){
       storage.Delete(std::to_string(i));
     }));
@@ -124,13 +124,13 @@ TEST(LsmStorageTest, TestPutGetDeleteMultithreaded) {
   // for (int i = 0; i < 100; i++) {
   //   storage.Delete(std::to_string(i));
   // }
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 10000; i++) {
     auto result = storage.Get(std::to_string(i));
     ASSERT_FALSE(result.has_value());
   }
 }
 
 int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
