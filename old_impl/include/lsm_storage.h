@@ -1,4 +1,6 @@
 #include "mem_table.h"
+#include "lsm_storage_iterator.h"
+#include "merge_iterator.h"
 #include <shared_mutex>
 #include <memory>
 #include <string>
@@ -31,6 +33,7 @@ public:
   size_t NextSSTId() {
     return next_sst_id.fetch_add(1, std::memory_order_relaxed);
   }
+  std::shared_ptr<LsmIterator> Scan(std::string start_key, std::string end_key);
 };
 
 // Define LsmStorageOptions

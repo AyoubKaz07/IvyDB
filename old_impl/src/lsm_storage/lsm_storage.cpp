@@ -1,4 +1,7 @@
 #include "include/lsm_storage.h"
+#include "include/lsm_storage_iterator.h"
+#include "include/mem_table.h"
+#include "include/merge_iterator.h"
 #include <mutex>
 #include <iostream>
 
@@ -23,11 +26,11 @@ std::optional<std::string> LsmStorageInner::Get(const std::string& key) {
   for (const auto& imm_memtable : state->imm_memtables) {
     result = imm_memtable->Get(key);
     if (result.has_value()) {
-    if (!result.value().empty()) {
-      return result;
+      if (!result.value().empty()) {
+        return result;
+      }
+      return std::nullopt;
     }
-    return std::nullopt;
-  }
   }
   return std::nullopt;
 }
@@ -84,4 +87,18 @@ void LsmStorageInner::ForceFreezeMemTable() {
     state->imm_memtables.insert(state->imm_memtables.begin(), old_mem_table);
   }
   state_lock.unlock();
+}
+
+std::shared_ptr<LsmIterator> LsmStorageInner::Scan(std::string start_key, std::string end_key) {
+  std::vector<LsmIterator> iterators;
+  std::shared_lock<std::shared_mutex> lock(rw_lock);
+  std::vector<MemTableIterator> mem_tables_iter(state->imm_memtables.size() + 1);
+  mem_tables_iter.push_back(state->mem_table->Scan(start_key, end_key));
+  for (size_t i = 0; i < state->imm_memtables.size(); i++) {
+    std::cout << "Scanning imm_memtable " << i << std::endl;
+    mem_tables_iter.push_back(state->imm_memtables[i]->Scan(start_key, end_key));
+  }
+  auto merge_iter = MergeIterator(mem_tables_iter);
+  auto iter = std::make_shared<LsmIterator>(merge_iter);
+  return iter;
 }

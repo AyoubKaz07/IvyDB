@@ -43,3 +43,8 @@ size_t MemTable::GetId() const {
 size_t MemTable::ApproximateSize() const {
   return approximate_size->load(std::memory_order_relaxed);
 }
+
+MemTableIterator MemTable::Scan(std::string lower_bound, std::string upper_bound) {
+  std::shared_lock lock(mutex);
+  return MemTableIterator(map, map->find(std::make_pair(lower_bound, std::string())), map->find(std::make_pair(upper_bound, std::string())));
+}
