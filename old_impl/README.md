@@ -1,1 +1,1 @@
-CANCELED, it went so bad, will implement it later after learning rust follow skyzh's mini-lsm 
+CANCELED, it went so bad, will implement it the much better way later, after learning rust then following skyzh's mini-lsm 
