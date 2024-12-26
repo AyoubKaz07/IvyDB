@@ -3,7 +3,7 @@ Aiming to get my hands dirtier and implement a Key-Value Store (KV Store) utiliz
 
 You can read about LSM Trees in DBMSs, i recommend reading chapter 3 of "Designing Data Intensive Applications" [https://github.com/lafengnan/ebooks-1/blob/master/Designing%20Data%20Intensive%20Applications.pdf]
 
-Implementation details
+## Implementation details
 
 SSTables: IvyDB implements SSTables for on-disk storage, providing a sorted representation of key-value pairs for efficient retrieval.
 
